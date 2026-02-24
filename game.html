@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Amazon.com: Online Shopping</title>
+    <style>
+        :root {
+            --amazon-navy: #232f3e;
+            --amazon-light-navy: #37475a;
+            --amazon-yellow: #ffd814;
+            --amazon-orange: #ffa41c;
+            --amazon-red: #B12704;
+            --prime-blue: #00A8E1;
+            --bg-gray: #eaeded;
+            --text-black: #0f1111;
+            --text-gray: #565959;
+            --ios-safe-top: env(safe-area-inset-top);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            overscroll-behavior-y: none;
+            touch-action: pan-y;
+            color: var(--text-black);
+            overflow-x: hidden;
+        }
+
+        button {
+            -webkit-tap-highlight-color: transparent;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* --- Header & Nav --- */
+        header {
+            background-color: var(--amazon-navy);
+            padding: calc(var(--ios-safe-top) + 10px) 15px 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            color: white;
+            font-weight: 800;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span { color: var(--amazon-orange); }
+
+        .search-container {
+            background: white;
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .search-placeholder {
+            color: #888;
+            font-size: 14px;
+            flex-grow: 1;
+        }
+
+        .nav-sub {
+            background-color: var(--amazon-light-navy);
+            color: white;
+            padding: 10px 15px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- Product Grid --- */
+        #main-feed {
+            padding: 10px;
+            transition: filter 0.3s ease, transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease;
+        }
+
+        .card {
+            background: white;
+            margin-bottom: 12px;
+            border-radius: 4px;
+            padding: 15px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card.dimmed {
+            opacity: 0.55;
+            filter: grayscale(100%);
+            pointer-events: none;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #e47911;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            width: fit-content;
+        }
+
+        .prime-badge {
+            color: var(--prime-blue);
+            font-weight: 900;
+            font-style: italic;
+            font-size: 13px;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 250px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .title {
+            font-size: 16px;
+            line-height: 1.3;
+            margin-bottom: 5px;
+        }
+
+        .stars {
+            color: #ffa41c;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .price {
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--text-black);
+            margin-bottom: 5px;
+        }
+
+        .status {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .status.in-stock { color: #007600; }
+        .status.recalled { color: var(--amazon-red); }
+
+        .specs {
+            background: #f7f7f7;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--text-gray);
+            margin-bottom: 10px;
+        }
+
+        .specs li {
+            list-style: none;
+            margin-bottom: 4px;
+        }
+
+        .warning {
+            color: var(--amazon-red);
+            font-weight: bold;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .btn-yellow { background-color: var(--amazon-yellow); }
+        .btn-orange { background-color: var(--amazon-orange); }
+
+        /* --- Action Sheet --- */
+        #action-sheet {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            z-index: 1000;
+            padding: 25px 20px 40px;
+            border-radius: 20px 20px 0 0;
+            transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
+        }
+
+        #action-sheet.active {
+            bottom: 0;
+        }
+
+        .sheet-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .sheet-text {
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        canvas {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            width: 100%;
+            height: 180px;
+            background: #fafafa;
+            touch-action: none;
+        }
+
+        .canvas-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .clear-link {
+            font-size: 13px;
+            color: #007185;
+            text-decoration: underline;
+        }
+
+        /* --- Proposal Stage --- */
+        #proposal-stage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff0f3;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        #proposal-stage.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .proposal-title {
+            font-size: 28px;
+            font-weight: 900;
+            color: #ff4d6d;
+            margin-bottom: 15px;
+        }
+
+        .proposal-subtext {
+            font-size: 16px;
+            color: #590d22;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 20px;
+            position: relative;
+            width: 100%;
+            justify-content: center;
+            height: 60px;
+        }
+
+        .prop-btn {
+            padding: 15px 35px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 18px;
+            min-width: 120px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        #yes-btn {
+            background: #ff4d6d;
+            color: white;
+        }
+
+        #no-btn {
+            background: #ccc;
+            color: #666;
+            position: absolute;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #no-btn::after {
+            content: '🦵🦵';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            display: none;
+        }
+
+        #no-btn.running::after {
+            display: block;
+            animation: run-legs 0.2s infinite;
+        }
+
+        @keyframes run-legs {
+            0% { transform: translateX(-50%) rotate(15deg); }
+            50% { transform: translateX(-50%) rotate(-15deg); }
+            100% { transform: translateX(-50%) rotate(15deg); }
+        }
+
+        #order-confirmed {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff4d6d;
+            display: none;
+            animation: heartBeat 1s infinite;
+        }
+
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.1); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); }
+            60% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <div class="logo">amazon<span>.com</span></div>
+            <div style="color: white; font-size: 20px;">🛒</div>
+        </div>
+        <div class="search-container">
+            <span class="search-placeholder">Search for the love of your life...</span>
+        </div>
+    </header>
+    <div class="nav-sub">
+        📍 Deliver to Her Heart - Worldwide
+    </div>
+
+    <div id="main-feed">
+        <!-- 1. Situationship Boss -->
+        <div class="card dimmed">
+            <div class="product-img">
+                <img src="situationship.jpg" alt="Situationship" onerror="this.src='https://placehold.co/400x400/e0e0e0/555555?text=Situationship+Boss'">
+            </div>
+            <div class="title">The Situationship Final Boss (Standard Edition)</div>
+            <div class="stars">★☆☆☆☆ (8,492 reviews)</div>
+            <div class="status recalled">STATUS: RECALLED</div>
+            <div class="price">$0.00</div>
+            <ul class="specs">
+                <li>• Pre-installed with "Let’s just see where it goes."</li>
+                <li>• Guaranteed to leave you on Delivered for 14 hours.</li>
+                <li>• Low Battery: Avoids labels at all costs.</li>
+            </ul>
+        </div>
+
+        <!-- 2. TikTok Addict -->
+        <div class="card dimmed">
+            <div class="product-img">
+                <img src="tiktok.jpg" alt="TikTok Addict" onerror="this.src='https://placehold.co/400x400/e0e0e0/555555?text=TikTok+Addict'">
+            </div>
+            <div class="title">Brainrot Addict / TikTok Scroll Pro</div>
+            <div class="stars">★☆☆☆☆ (14,203 reviews)</div>
+            <div class="status recalled">STATUS: DISCONTINUED</div>
+            <div class="price">Free with ads</div>
+            <ul class="specs">
+                <li>• Communicates exclusively in FYP sounds.</li>
+                <li>• Will scroll TikTok during your anniversary dinner.</li>
+                <li>• Attention span: 7 seconds.</li>
+            </ul>
+        </div>
+
+        <!-- 3. Hustle Bro -->
+        <div class="card dimmed">
+            <div class="product-img">
+                <img src="hustle_bro.jpg" alt="Hustle Bro" onerror="this.src='https://placehold.co/400x400/e0e0e0/555555?text=Hustle+Bro'">
+            </div>
+            <div class="title">Delusional Hustle Bro (V1.2)</div>
+            <div class="stars">★½☆☆☆ (404 reviews)</div>
+            <div class="status recalled">STATUS: BANKRUPT</div>
+            <div class="price">-$200.00</div>
+            <ul class="specs">
+                <li>• Crypto portfolio down 85%.</li>
+                <li>• Makes you split a $12 Uber (Business expense).</li>
+                <li>• Wakes up at 4 AM to stare at a wall.</li>
+            </ul>
+        </div>
+
+        <!-- 4. PREMIUM MUFADDAL -->
+        <div class="card" id="mufaddal-card">
+            <div class="badge">Amazon's Choice</div>
+            <div class="product-img">
+                <img src="mufaddal.jpg" alt="Mufaddal" onerror="this.src='https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=1000'">
+            </div>
+            <div class="title"><b>The Premium Mufaddal Edition (1-of-1 Bundle)</b></div>
+            <div class="stars">★★★★★ (Editor's Pick)</div>
+            <div class="status in-stock">STATUS: IN STOCK</div>
+            <div class="price">1 Daily Forehead Kiss</div>
+            <div class="prime-badge">✓ prime <span style="color:var(--text-gray); font-weight:normal; font-style:normal; font-size: 11px;">FREE Next-Day Delivery</span></div>
+            
+            <ul class="specs">
+                <li>• <b>High-Fashion Aesthetics:</b> Styled flawlessly for every occasion.</li>
+                <li>• <b>Stat Maxing:</b> Aggressively optimized finance, diet, and aesthetic stats.</li>
+                <li>• <b>Toxic-Immune:</b> Survives Concentrix corporate transport trauma with ease.</li>
+                <li>• <b>Elite Logistics:</b> Lightning-fast responses via Blinkit delivery logic.</li>
+                <li>• <b>Cinematic Taste:</b> Understands Interstellar in IMAX is the peak of human art.</li>
+            </ul>
+            <div class="warning">⚠️ Violently refuses to let you pay the bill.</div>
+            
+            <div style="margin-top: 15px;">
+                <button class="btn btn-yellow" onclick="openCheckout()">Add to Cart</button>
+                <button class="btn btn-orange" onclick="openCheckout()">Buy Now</button>
+            </div>
+        </div>
+
+        <!-- 5. Gamer -->
+        <div class="card dimmed">
+            <div class="product-img">
+                <img src="gamer.jpg" alt="Gamer" onerror="this.src='https://placehold.co/400x400/e0e0e0/555555?text=Gamer'">
+            </div>
+            <div class="title">The Rage-Quitting Gamer</div>
+            <div class="stars">★★☆☆☆ (300 reviews)</div>
+            <div class="status recalled">OUT OF STOCK (Smashed)</div>
+            <ul class="specs">
+                <li>• Punches monitor over Clash Royale.</li>
+                <li>• Hygiene: Questionable (Firmware update required).</li>
+            </ul>
+        </div>
+
+        <!-- 6. Hug Menace -->
+        <div class="card dimmed">
+            <div class="product-img">
+                <img src="hug_menace.jpg" alt="Hug Menace" onerror="this.src='https://placehold.co/400x400/e0e0e0/555555?text=Hug+Menace'">
+            </div>
+            <div class="title">The 'Where's My Hug?' Menace</div>
+            <div class="stars">★☆☆☆☆ (1,200 reviews)</div>
+            <div class="status recalled">RECALLED</div>
+            <ul class="specs">
+                <li>• Hovers uncomfortably close.</li>
+                <li>• Zero social calibration or spatial awareness.</li>
+            </ul>
+        </div>
+
+        <!-- 7. Yapper -->
+        <div class="card dimmed">
+            <div class="product-img">
+                <img src="yapper.jpg" alt="Yapper" onerror="this.src='https://placehold.co/400x400/e0e0e0/555555?text=Professional+Yapper'">
+            </div>
+            <div class="title">The Professional Yapper</div>
+            <div class="stars">★☆☆☆☆ (800 reviews)</div>
+            <div class="status recalled">STATUS: MUTED</div>
+            <ul class="specs">
+                <li>• Treats dates like interviews for his failed podcast.</li>
+                <li>• Threatens to "disrupt the space."</li>
+            </ul>
+        </div>
+
+        <!-- 8. I Know a Spot -->
+        <div class="card dimmed">
+            <div class="product-img">
+                <img src="know_a_spot.jpg" alt="I Know A Spot" onerror="this.src='https://placehold.co/400x400/e0e0e0/555555?text=I+Know+A+Spot+Guy'">
+            </div>
+            <div class="title">The 'I Know a Spot' Guy</div>
+            <div class="stars">★½☆☆☆ (50 reviews)</div>
+            <div class="status recalled">STATUS: LOST</div>
+            <ul class="specs">
+                <li>• The spot is always a dimly lit parking lot.</li>
+                <li>• GPS signal non-existent.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Action Sheet -->
+    <div id="action-sheet">
+        <div class="sheet-title">Final Agreement</div>
+        <p class="sheet-text">By signing below, you acknowledge that this is a non-refundable lifetime contract for maximum affection, quality time, and premium treatment. Mufaddal cannot be returned once the seal is broken.</p>
+        
+        <canvas id="signature-pad"></canvas>
+        
+        <div class="canvas-controls">
+            <span class="clear-link" onclick="clearCanvas()">Clear Signature</span>
+            <span style="font-size: 11px; color: #888;">Signed via Secure Amazon Pay</span>
+        </div>
+
+        <button class="btn btn-orange" onclick="confirmSignature()">Confirm Signature & Buy Now</button>
+    </div>
+
+    <!-- Final Proposal -->
+    <div id="proposal-stage">
+        <div id="proposal-content">
+            <h1 class="proposal-title">Will you be my girlfriend?</h1>
+            <p class="proposal-subtext">Transaction Approved. You have officially purchased the exclusive right to my time. I just need verbal confirmation.</p>
+            
+            <div class="btn-container">
+                <button id="yes-btn" class="prop-btn" onclick="sayYes()">Yes</button>
+                <button id="no-btn" class="prop-btn">No</button>
+            </div>
+        </div>
+        <div id="order-confirmed">Order Confirmed ❤️</div>
+    </div>
+
+    <script>
+        const sheet = document.getElementById('action-sheet');
+        const feed = document.getElementById('main-feed');
+        const canvas = document.getElementById('signature-pad');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let hasSigned = false;
+
+        // --- Canvas Logic ---
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            ctx.strokeStyle = "#222";
+            ctx.lineWidth = 3;
+            ctx.lineJoin = "round";
+            ctx.lineCap = "round";
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            e.preventDefault();
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const pos = getPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            hasSigned = true;
+            e.preventDefault();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('touchstart', startDrawing, {passive: false});
+        canvas.addEventListener('touchmove', draw, {passive: false});
+        canvas.addEventListener('touchend', stopDrawing);
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            hasSigned = false;
+        }
+
+        // --- UI Flows ---
+        function openCheckout() {
+            sheet.classList.add('active');
+            feed.style.filter = "brightness(50%)";
+            setTimeout(resizeCanvas, 100);
+        }
+
+        function confirmSignature() {
+            if (!hasSigned) {
+                alert("Signature required to verify high-value purchase.");
+                return;
+            }
+
+            // Phase 3: Transition
+            sheet.classList.remove('active');
+            feed.style.transform = "scale(0.05)";
+            feed.style.opacity = "0";
+            
+            setTimeout(() => {
+                feed.style.display = "none";
+                document.querySelector('header').style.display = "none";
+                document.querySelector('.nav-sub').style.display = "none";
+                const stage = document.getElementById('proposal-stage');
+                stage.classList.add('active');
+            }, 800);
+        }
+
+        function sayYes() {
+            document.getElementById('proposal-content').style.display = "none";
+            document.getElementById('order-confirmed').style.display = "block";
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+        }
+
+        // --- Evasive No Button Logic ---
+        const noBtn = document.getElementById('no-btn');
+        
+        function moveNoButton() {
+            noBtn.classList.add('running');
+            const container = document.querySelector('.btn-container');
+            const rect = container.getBoundingClientRect();
+            
+            const maxX = rect.width - noBtn.offsetWidth;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 100;
+            
+            const randomX = Math.floor(Math.random() * maxX) - (rect.width/2);
+            const randomY = Math.floor(Math.random() * 400) - 200; // Random vertical range
+            
+            noBtn.style.left = `${randomX}px`;
+            noBtn.style.top = `${randomY}px`;
+        }
+
+        noBtn.addEventListener('mouseover', moveNoButton);
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            moveNoButton();
+        });
+
+        // Initialize
+        window.onload = resizeCanvas;
+        window.onresize = resizeCanvas;
+
+    </script>
+</body>
+</html>
